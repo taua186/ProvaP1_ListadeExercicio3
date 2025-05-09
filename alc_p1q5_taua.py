@@ -16,7 +16,9 @@ def norma_p_matriz_2por2(matriz, p):
 
     # Função para calcular a norma-p de um vetor
     def norma_p_vetor(vetor, p):
-        return sum(abs(vi) ** p for vi in vetor) ** (1 / p)
+        if np.isinf(p):
+            return max(abs(vi) for vi in vetor)
+        return sum(abs(vi)**p for vi in vetor)**(1/p)
 
     # Função para aplicar a matriz a um vetor
     def aplicar_matriz(matriz, vetor):
@@ -27,15 +29,21 @@ def norma_p_matriz_2por2(matriz, p):
 
     # Gerar pontos no círculo unitário para norma-p
     num_pontos = 1000
-    angulos = np.linspace(0, 2 * np.pi, num_pontos, endpoint=False)
-    vetores_unitarios = [
-        [np.cos(theta), np.sin(theta)]
-        for theta in angulos
-    ]
-    vetores_unitarios = [
-        [v[0] / norma_p_vetor(v, p), v[1] / norma_p_vetor(v, p)]
-        for v in vetores_unitarios
-    ]
+    if np.isinf(p):  # Caso especial para p = infinito
+        vetores_unitarios = [
+            [np.sign(np.cos(theta)), np.sign(np.sin(theta))]
+            for theta in np.linspace(0, 2 * np.pi, num_pontos, endpoint=False)
+        ]
+    else:
+        angulos = np.linspace(0, 2 * np.pi, num_pontos, endpoint=False)
+        vetores_unitarios = [
+            [np.cos(theta), np.sin(theta)]
+            for theta in angulos
+        ]
+        vetores_unitarios = [
+            [v[0] / norma_p_vetor(v, p), v[1] / norma_p_vetor(v, p)]
+            for v in vetores_unitarios
+        ]
 
     # Calcular a norma-p de A * x para cada vetor unitário x
     normais_p = [
@@ -51,5 +59,3 @@ matriz_exemplo = np.array([[1, 2], [3, 4]])
 p_valor = 2
 norma = norma_p_matriz_2por2(matriz_exemplo, p_valor)
 print(f"A norma-{p_valor} da matriz é: {norma:.4f}")
-
-
