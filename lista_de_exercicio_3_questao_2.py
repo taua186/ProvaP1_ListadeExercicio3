@@ -1,48 +1,40 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from numpy.linalg import cond, eig
 
-def wilkinson_bidiagonal_matrix(n):
+def crossprod(u, v):
     """
-    Constructs an n x n Wilkinson bidiagonal matrix.
+    Calculate the cross product of two 3D vectors u and v.
+
+    Parameters:
+        u (list or np.ndarray): A 3D vector.
+        v (list or np.ndarray): A 3D vector.
+
+    Returns:
+        np.ndarray: The cross product u x v.
     """
-    A = np.diag(np.arange(n, 0, -1)) + np.diag(n * np.ones(n - 1), 1)
-    return A
+    assert len(u) == 3 and len(v) == 3, "Vectors must be 3-dimensional."
+    
+    result = [
+        u[1] * v[2] - u[2] * v[1],
+        u[2] * v[0] - u[0] * v[2],
+        u[0] * v[1] - u[1] * v[0]
+    ]
+    
+    return np.array(result)
 
-# Part (b): Compute and graph condition numbers
-condition_numbers = []
-orders = range(1, 16)
-for n in orders:
-    A = wilkinson_bidiagonal_matrix(n)
-    condition_numbers.append(cond(A))
+# Define vectors u and v
+u = np.array([1, 2, 3])
+v = np.array([4, 5, 6])
 
-# Plot the condition numbers
-plt.figure(figsize=(8, 5))
-plt.plot(orders, condition_numbers, marker='o', label='Condition Number')
-plt.xlabel('Matrix Order (n)')
-plt.ylabel('Condition Number')
-plt.title('Condition Number of Wilkinson Bidiagonal Matrices')
-plt.grid(True)
-plt.tight_layout()
-plt.legend()
-plt.show()
+# Compute u x v and v x u
+u_cross_v = crossprod(u, v)
+v_cross_u = crossprod(v, u)
 
-# Part (c): Eigenvalue computation and perturbation analysis
-n = 20
-A = wilkinson_bidiagonal_matrix(n)
-eigenvalues_original = np.sort(np.real(eig(A)[0]))
+# Compute dot products
+u_cross_v_dot_u = np.dot(u_cross_v, u)
+v_cross_u_dot_v = np.dot(v_cross_u, v)
 
-# Perturb A by 10^-10 at position (20, 1)
-A[19, 0] += 1e-10
-eigenvalues_perturbed = np.sort(np.real(eig(A)[0]))
-
-# Display results
-print("Original Eigenvalues:")
-print(eigenvalues_original)
-print("\nPerturbed Eigenvalues:")
-print(eigenvalues_perturbed)
-
-# Differences between eigenvalues
-print("\nDifferences between Original and Perturbed Eigenvalues:")
-differences = np.abs(eigenvalues_original - eigenvalues_perturbed)
-print(differences)
+# Print results
+print("u x v:", u_cross_v)
+print("v x u:", v_cross_u)
+print("(u x v) . u:", u_cross_v_dot_u)
+print("(v x u) . v:", v_cross_u_dot_v)
